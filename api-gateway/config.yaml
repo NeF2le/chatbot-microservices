@@ -1,0 +1,11 @@
+http:
+  host: "0.0.0.0"
+  port: "5050"
+  read_timeout: "5s"
+  write_timeout: "10s"
+  shutdown_timeout: "5s"
+services:
+  telegram_adapter:
+    url: "http://localhost:7070"
+  bot_core:
+    url: "http://localhost:8080"

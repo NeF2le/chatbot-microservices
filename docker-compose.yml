@@ -1,0 +1,71 @@
+services:
+  skills-bot:
+    build: ./api-gateway
+    container_name: skills-bot
+    ports:
+      - "5050:5050"
+    environment:
+      - HTTP_HOST=skills-bot
+      - HTTP_PORT=5050
+
+      - SERVICES_TELEGRAM_ADAPTER_URL=http://telegram-adapter:7070
+      - SERVICES_BOT_CORE_URL=http://bot-core:8080
+
+      - GIN_MODE=release
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://skills-bot:5050/api/v1/ping" ]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  bot-core:
+    build: ./bot-core
+    container_name: bot-core
+    ports:
+      - "8080:8080"
+    environment:
+      - HTTP_HOST=bot-core
+      - HTTP_PORT=8080
+
+      - SKILLS_ECHO_SKILL_URL=http://echo-skill:9090
+
+      - GIN_MODE=release
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://bot-core:8080/healthz" ]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  echo-skill:
+    build: ./skills/echo-skill
+    container_name: echo-skill
+    ports:
+      - "9090:9090"
+    environment:
+      - HTTP_HOST=echo-skill
+      - HTTP_PORT=9090
+
+      - GIN_MODE=release
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://echo-skill:9090/healthz" ]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  telegram-adapter:
+    build: ./adapters/telegram
+    container_name: telegram-adapter
+    ports:
+      - "7070:7070"
+    environment:
+      - HTTP_HOST=telegram-adapter
+      - HTTP_PORT=7070
+
+      - SERVICES_BOT_CORE_URL=http://bot-core:8080/message
+
+      - GIN_MODE=release
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://telegram-adapter:7070/healthz" ]
+      interval: 5s
+      timeout: 2s
+      retries: 5

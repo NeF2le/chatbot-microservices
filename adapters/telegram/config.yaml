@@ -1,0 +1,9 @@
+http:
+  host: "0.0.0.0"
+  port: "7070"
+  read_timeout: "5s"
+  write_timeout: "10s"
+  shutdown_timeout: "5s"
+services:
+  bot_core:
+    url: "http://bot-core:8080/bot/message"
